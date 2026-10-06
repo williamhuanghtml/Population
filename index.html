@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>國小自然生態探險隊：族群與群集大冒險</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    .font-fun {
+      font-family: 'Fredoka', 'Noto Sans TC', cursive, sans-serif;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1deg); }
+    }
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes pulse-subtle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2.5s ease-in-out infinite;
+    }
+    /* 列印獎狀專用樣式 */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #certificate-page, #certificate-page * {
+        visibility: visible;
+      }
+      #certificate-page {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-teal-50 to-amber-50 min-h-screen text-slate-800 antialiased selection:bg-emerald-200">
+
+  <nav class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-emerald-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('home-screen')">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-xl shadow-md">
+          🌿
+        </div>
+        <div>
+          <h1 class="text-lg md:text-xl font-black text-emerald-900 tracking-tight flex items-center gap-2">
+            生態探險隊 <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">六年級自然</span>
+          </h1>
+          <p class="text-xs text-slate-500">族群 (Population) 與 群集 (Community) 闖關遊戲</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-2">
+        <button id="sound-btn" onclick="toggleAudio()" class="p-2 rounded-xl bg-slate-100 hover:bg-emerald-100 text-slate-600 hover:text-emerald-700 transition flex items-center gap-1.5 text-xs font-bold" title="開關音效">
+          <span id="sound-icon">🔊</span>
+          <span class="hidden sm:inline" id="sound-text">音效開</span>
+        </button>
+        <button onclick="showScreen('guide-screen')" class="px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-xs transition flex items-center gap-1">
+          <span>📖</span> <span>概念複習</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-4 py-6 md:py-10">
+
+    <section id="home-screen" class="space-x-0 space-y-8">
+      <!-- 英雄區塊 -->
+      <div class="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 rounded-3xl p-6 sm:p-10 text-white shadow-xl">
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-2xl">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/30 text-emerald-100 border border-emerald-300/30 text-xs font-bold tracking-wider mb-4 uppercase">
+            🌱 10分鐘自然素養評量
+          </span>
+          <h2 class="text-2xl sm:text-4xl font-black mb-4 leading-tight">
+            你能分得清「族群」和「群集」嗎？
+          </h2>
+          <p class="text-emerald-50 text-sm sm:text-base mb-6 leading-relaxed">
+            生活在同一片森林裡的黑熊是族群？還是整座森林所有的動植物才是族群？
+            透過 10 道活潑的生活情境題，測測你的生態觀察眼力！只要達到 <strong>85%（答對9題以上）</strong>，就能榮獲精美的「生態小博士榮譽獎狀」喔！
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4">
+            <button onclick="startQuiz()" class="px-8 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-base sm:text-lg shadow-lg hover:shadow-xl transition transform active:scale-95 flex items-center gap-2 animate-pulse-subtle">
+              <span>🚀 立即開始 10 題挑戰</span>
+            </button>
+            <button onclick="showScreen('guide-screen')" class="px-6 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-bold text-sm sm:text-base backdrop-blur transition border border-white/30">
+              💡 先看 30 秒秒懂秘笈
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 族群卡片 -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-emerald-200 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-black">關鍵字：單一物種</span>
+            <span class="text-3xl">🦆🦆🦆</span>
+          </div>
+          <h3 class="text-xl font-black text-emerald-800 mb-2">什麼是「族群」？</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-4">
+            在<strong>「同一時間」</strong>生活在<strong>「同一特定地點」</strong>的<strong>「同一種生物」</strong>的所有個體集合！
+          </p>
+          <div class="bg-emerald-50/80 rounded-2xl p-3 border border-emerald-100 text-xs text-emerald-900 space-y-1">
+            <div class="font-bold flex items-center gap-1.5 text-emerald-700">
+              <span>📌 課本經典例子：</span>
+            </div>
+            <p>• 每年冬天在台南七股濕地的<strong>黑面琵鷺</strong></p>
+            <p>• 陽明山夢幻湖裡的<strong>台灣水韭</strong></p>
+            <p>• 草原上正在奔馳的所有<strong>斑馬</strong></p>
+          </div>
+        </div>
+
+        <!-- 群集卡片 -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-teal-200 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-xl bg-teal-100 text-teal-800 text-xs font-black">關鍵字：所有生物（多種）</span>
+            <span class="text-3xl">🌳🐛🐦🍄</span>
+          </div>
+          <h3 class="text-xl font-black text-teal-800 mb-2">什麼是「群集」？</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-4">
+            在<strong>「同一時間」</strong>與<strong>「同一特定地點」</strong>，所有生活在一起的<strong>「不同生物族群的總和」</strong>！
+          </p>
+          <div class="bg-teal-50/80 rounded-2xl p-3 border border-teal-100 text-xs text-teal-900 space-y-1">
+            <div class="font-bold flex items-center gap-1.5 text-teal-700">
+              <span>📌 課本經典例子：</span>
+            </div>
+            <p>• 淡水紅樹林裡的<strong>水筆仔、彈塗魚、招潮蟹與白鷺鷥</strong></p>
+            <p>• 池塘裡所有的<strong>魚、蝦、水草、藻類與細菌</strong></p>
+            <p>• 森林中共同生活的所有<strong>動物、植物與微生物</strong></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="guide-screen" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-lg">
+        <div class="flex items-center justify-between border-b pb-4 mb-6">
+          <div>
+            <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+              <span>📖</span> 生態雙胞胎辨析指南
+            </h2>
+            <p class="text-xs text-slate-500">6年級自然課必備高分秘笈！用 3 個提問法秒殺題目</p>
+          </div>
+          <button onclick="showScreen('home-screen')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs">
+            返回
+          </button>
+        </div>
+
+        <!-- 3大要素判斷表 -->
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-emerald-600 text-white rounded-t-xl">
+                <th class="p-3.5 rounded-tl-xl font-bold">判斷步驟</th>
+                <th class="p-3.5 font-bold">族群 (Population)</th>
+                <th class="p-3.5 rounded-tr-xl font-bold">群集 (Community)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-emerald-50/30">
+              <tr>
+                <td class="p-3.5 font-bold text-slate-700">1. 時間與空間？</td>
+                <td class="p-3.5 text-emerald-800">✅ 必須同一時間、同一特定環境</td>
+                <td class="p-3.5 text-teal-800">✅ 必須同一時間、同一特定環境</td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-bold text-slate-700">2. 有幾種生物？</td>
+                <td class="p-3.5 text-emerald-700 font-black">🌟 只有「同一種」生物（如：全部都是黑面琵鷺）</td>
+                <td class="p-3.5 text-teal-700 font-black">🌟 包含「多種」生物（此地的所有生物族群）</td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-bold text-slate-700">3. 關係與互動？</td>
+                <td class="p-3.5 text-slate-600">個體間會互相交配、繁殖後代、分工或競爭</td>
+                <td class="p-3.5 text-slate-600">存在食物鏈（捕食、被捕食）、競爭、共生等複雜生態網</td>
+              </tr>
+              <tr class="bg-amber-50">
+                <td class="p-3.5 font-black text-amber-900">常見陷阱！</td>
+                <td class="p-3.5 text-amber-800 text-xs">「池塘裡的魚」不是族群！因為池塘裡通常有鯉魚、吳郭魚等多種魚。必須指定「池塘裡的吳郭魚」才是族群！</td>
+                <td class="p-3.5 text-amber-800 text-xs">「超市生鮮區的水果和魚」不是群集！因為它們不是自然生活在同一環境的生命群體。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="text-center pt-2">
+          <button onclick="startQuiz()" class="px-8 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg shadow-md transition transform active:scale-95">
+            我懂了！開始測驗 👉
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz-screen" class="hidden space-y-6">
+      <!-- 頂部資訊列：計時、題號與進度條 -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center space-x-3 w-full sm:w-auto justify-between">
+          <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-xl font-black text-xs">
+            題目進度：<span id="current-q-index">1</span> / <span id="total-q-count">10</span>
+          </span>
+          <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-xl">
+            <span>⏱️ 測驗時間：</span>
+            <span id="quiz-timer" class="font-mono text-emerald-700 font-black">00:00</span>
+          </div>
+        </div>
+
+        <!-- 進度條 -->
+        <div class="w-full sm:w-56 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div id="progress-bar-fill" class="h-full bg-emerald-500 rounded-full transition-all duration-300 w-[10%]"></div>
+        </div>
+      </div>
+
+      <!-- 題目卡片容器 -->
+      <div id="question-card" class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-emerald-100 shadow-lg relative overflow-hidden transition-all">
+        <!-- 題型徽章與主題情境 -->
+        <div class="flex items-center justify-between gap-2 mb-4">
+          <span id="q-category" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 flex items-center gap-1">
+            🌿 生態情境判別
+          </span>
+          <span id="q-hint-tag" class="text-xs text-slate-400 font-medium">請仔細看清「受測對象」喔！</span>
+        </div>
+
+        <!-- 題目內文 -->
+        <h3 id="q-title" class="text-xl sm:text-2xl font-black text-slate-800 mb-6 leading-relaxed">
+          載入題目中...
+        </h3>
+
+        <!-- 情境小圖示/生動標籤 -->
+        <div id="q-scenario-box" class="mb-6 p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex items-center gap-4">
+          <div id="q-emoji" class="text-4xl sm:text-5xl shrink-0 p-2 bg-white rounded-2xl shadow-sm">
+            🦆
+          </div>
+          <div class="text-xs sm:text-sm text-slate-600 leading-relaxed" id="q-scenario-desc">
+            描述載入中...
+          </div>
+        </div>
+
+        <!-- 答案選項 (A/B二選一或多選單選) -->
+        <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <!-- 動態插入選項 -->
+        </div>
+
+        <!-- 即時解析回饋面板 (作答後顯現) -->
+        <div id="feedback-panel" class="hidden p-5 rounded-2xl border transition-all mt-4">
+          <div class="flex items-start gap-3">
+            <span id="feedback-icon" class="text-2xl">💡</span>
+            <div class="space-y-1.5 flex-1">
+              <h4 id="feedback-title" class="font-black text-base">回答結果</h4>
+              <p id="feedback-explanation" class="text-sm leading-relaxed text-slate-700"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部切換下一題按鈕 -->
+        <div class="flex justify-end mt-6">
+          <button id="next-btn" onclick="goToNextQuestion()" class="hidden px-7 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-base shadow-md transition transform active:scale-95 flex items-center gap-2">
+            <span>下一題</span> <span>👉</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="result-screen" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl text-center max-w-2xl mx-auto relative overflow-hidden">
+        
+        <!-- 成績徽章 -->
+        <div id="result-badge-container" class="w-24 h-24 mx-auto mb-4 rounded-3xl flex items-center justify-center text-5xl shadow-lg animate-float">
+          🏆
+        </div>
+
+        <h2 id="result-heading" class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">
+          挑戰完成！
+        </h2>
+        <p id="result-subheading" class="text-sm text-slate-500 mb-6">
+          來看看你這次的生態探險成果吧！
+        </p>
+
+        <!-- 分數卡片 -->
+        <div class="grid grid-cols-3 gap-3 max-w-md mx-auto mb-6">
+          <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-3">
+            <span class="text-xs text-slate-500 font-bold block">總題數</span>
+            <span id="res-total" class="text-xl sm:text-2xl font-black text-emerald-800">10</span>
+          </div>
+          <div class="bg-teal-50 border border-teal-100 rounded-2xl p-3">
+            <span class="text-xs text-slate-500 font-bold block">答對題數</span>
+            <span id="res-correct" class="text-xl sm:text-2xl font-black text-teal-800">0</span>
+          </div>
+          <div class="bg-amber-50 border border-amber-100 rounded-2xl p-3">
+            <span class="text-xs text-slate-500 font-bold block">答對百分比</span>
+            <span id="res-percentage" class="text-xl sm:text-2xl font-black text-amber-700">0%</span>
+          </div>
+        </div>
+
+        <!-- 達標與未達標不同回饋 -->
+        <div id="result-feedback-box" class="p-5 rounded-2xl mb-8 text-left text-sm leading-relaxed border">
+          <!-- 動態載入正向鼓勵文字 -->
+        </div>
+
+        <!-- 操作按鈕群 -->
+        <div id="result-actions" class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <!-- 動態按鈕 -->
+        </div>
+      </div>
+
+      <!-- 錯題回顧清單 -->
+      <div id="review-section" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-md max-w-3xl mx-auto">
+        <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
+          <span>📝</span> 實戰試題深度檢討與解析
+        </h3>
+        <div id="review-list" class="space-y-4">
+          <!-- 動態產生 -->
+        </div>
+      </div>
+    </section>
+
+    <section id="certificate-page" class="hidden py-4">
+      <div class="no-print max-w-2xl mx-auto mb-4 flex items-center justify-between">
+        <button onclick="showScreen('result-screen')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1">
+          ← 返回成績報告
+        </button>
+        <button onclick="window.print()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-black text-sm shadow-md flex items-center gap-2">
+          🖨️ 列印/儲存為PDF獎狀
+        </button>
+      </div>
+
+      <!-- 獎狀主體紙張 -->
+      <div class="max-w-3xl mx-auto bg-gradient-to-br from-amber-50 via-white to-emerald-50 border-8 border-double border-amber-500/80 rounded-3xl p-8 sm:p-14 shadow-2xl relative overflow-hidden">
+        <!-- 獎狀邊角古風幾何裝飾 -->
+        <div class="absolute top-4 left-4 w-12 h-12 border-t-4 border-l-4 border-amber-600 rounded-tl-xl pointer-events-none"></div>
+        <div class="absolute top-4 right-4 w-12 h-12 border-t-4 border-r-4 border-amber-600 rounded-tr-xl pointer-events-none"></div>
+        <div class="absolute bottom-4 left-4 w-12 h-12 border-b-4 border-l-4 border-amber-600 rounded-bl-xl pointer-events-none"></div>
+        <div class="absolute bottom-4 right-4 w-12 h-12 border-b-4 border-r-4 border-amber-600 rounded-br-xl pointer-events-none"></div>
+
+        <!-- 浮水印 -->
+        <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none text-9xl">
+          🌱
+        </div>
+
+        <div class="text-center relative z-10 space-y-6">
+          <div class="inline-block p-2 rounded-full bg-amber-100 text-amber-800 text-xs font-black tracking-widest uppercase mb-1">
+            ★ 國小六年級自然與生活科技領域榮譽認證 ★
+          </div>
+
+          <h2 class="text-3xl sm:text-5xl font-black text-slate-800 tracking-tight font-fun">
+            生態小博士榮譽獎狀
+          </h2>
+
+          <p class="text-slate-600 text-sm sm:text-base">
+            茲證明六年級優秀探險家：
+          </p>
+
+          <!-- 學生姓名輸入與顯示區 -->
+          <div class="my-4">
+            <input type="text" id="cert-student-name" value="六年級小小生態家" 
+              class="no-print text-center text-2xl sm:text-3xl font-black text-emerald-800 border-b-2 border-emerald-500 bg-transparent px-4 py-1 focus:outline-none focus:border-amber-500 transition max-w-xs mx-auto block" 
+              title="點此可以修改你的大名">
+            <div id="cert-student-name-print" class="hidden text-2xl sm:text-3xl font-black text-emerald-800">
+              六年級小小生態家
+            </div>
+            <span class="no-print text-[11px] text-slate-400 block mt-1">（點擊上方文字可自訂學生姓名喔！）</span>
+          </div>
+
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
+            於本次<strong>「族群與群集概念大冒險」</strong>評量中表現卓越，透徹掌握「族群（同種個體）」與「群集（生活在同一環境的全部生物）」之核心生態概念，達成 <span id="cert-score-display" class="font-black text-amber-700 text-xl">100%</span> 優秀答對率，特頒此狀以資鼓勵！
+          </p>
+
+          <!-- 獎章圖示與評語章戳 -->
+          <div class="flex items-center justify-around pt-6 border-t border-amber-200/80 mt-6">
+            <div class="text-left">
+              <span class="text-xs text-slate-400 block">認證日期</span>
+              <span id="cert-date" class="font-bold text-slate-700 text-sm">2026 年 10 月 4 日</span>
+            </div>
+
+            <!-- 金牌章戳 -->
+            <div class="w-20 h-20 rounded-full border-4 border-amber-500 bg-gradient-to-tr from-amber-400 to-yellow-200 shadow-md flex flex-col items-center justify-center transform rotate-6">
+              <span class="text-xs font-black text-amber-900 leading-tight">榮譽優等</span>
+              <span class="text-xl">🎖️</span>
+              <span class="text-[9px] font-bold text-amber-900">特優合格</span>
+            </div>
+
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block">頒證單位</span>
+              <span class="font-black text-emerald-900 text-sm">自然科探險教研中心</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    /* 音效控制設定 (使用 Tone.js Web Audio 合成音，不依賴外部音檔) */
+    let soundEnabled = true;
+    let synth = null;
+
+    function initAudio() {
+      if (!synth && window.Tone) {
+        try {
+          synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.02, decay: 0.1, sustain: 0.2, release: 0.4 }
+          }).toDestination();
+          synth.volume.value = -8;
+        } catch (e) {
+          console.log("Audio not supported or waiting for interaction");
+        }
+      }
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!synth) return;
+
+      try {
+        if (Tone.context.state !== 'running') {
+          Tone.context.resume();
+        }
+        const now = Tone.now();
+        if (type === 'correct') {
+          synth.triggerAttackRelease(["E5", "G#5", "B5"], "8n", now);
+        } else if (type === 'wrong') {
+          synth.triggerAttackRelease(["D4", "C4"], "8n", now);
+        } else if (type === 'click') {
+          synth.triggerAttackRelease("C5", "16n", now);
+        } else if (type === 'celebrate') {
+          synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "4n", now);
+        }
+      } catch (err) {}
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('sound-icon');
+      const text = document.getElementById('sound-text');
+      const btn = document.getElementById('sound-btn');
+      if (soundEnabled) {
+        icon.textContent = '🔊';
+        text.textContent = '音效開';
+        btn.classList.replace('text-slate-400', 'text-slate-600');
+        playSound('click');
+      } else {
+        icon.textContent = '🔇';
+        text.textContent = '音效關';
+        btn.classList.replace('text-slate-600', 'text-slate-400');
+      }
+    }
+
+    const originalQuestions = [
+      {
+        id: 1,
+        title: "每年冬天飛到台南七股曾文溪口度冬的「所有黑面琵鷺」，在生態學上屬於？",
+        category: "七股濕地探險",
+        emoji: "🦩",
+        scenario: "時間：同一個冬天 / 地點：七股曾文溪口 / 對象：全部都是「黑面琵鷺」這一種鳥類。",
+        options: [
+          { text: "族群 (Population)", isCorrect: true },
+          { text: "群集 (Community)", isCorrect: false }
+        ],
+        explanation: "正確！因為是在【同一時間】、【同一特定地點（七股濕地）】，而且全部是【同一種生物（黑面琵鷺）】，所以是標準的「族群」！"
+      },
+      {
+        id: 2,
+        title: "陽明山夢幻湖水域中，同時生活在一起的所有「水生昆蟲、台灣水韭、魚類、藻類與細菌」，屬於？",
+        category: "陽明山夢幻湖",
+        emoji: "🌿",
+        scenario: "時間：同一時期 / 地點：夢幻湖 / 對象：包含了植物、昆蟲、魚類和微小藻類等「多種生物」。",
+        options: [
+          { text: "族群 (Population)", isCorrect: false },
+          { text: "群集 (Community)", isCorrect: true }
+        ],
+        explanation: "答對了！因為夢幻湖裡不只有一種生物，而是生活在該處【所有不同物種族群的集合】，包含了動物、植物與微生物，因此屬於「群集」！"
+      },
+      {
+        id: 3,
+        title: "高雄柴山（壽山）國家自然公園中，目前生活在那裡的所有「台灣獼猴」，屬於？",
+        category: "壽山森林生態",
+        emoji: "🐒",
+        scenario: "時間：現階段 / 地點：柴山自然公園 / 對象：專指所有的「台灣獼猴」。",
+        options: [
+          { text: "族群 (Population)", isCorrect: true },
+          { text: "群集 (Community)", isCorrect: false }
+        ],
+        explanation: "太棒了！雖然柴山還有許多樹木與鳥類，但題目特別指明只有「台灣獼猴」這一種生物，因此符合同時間、同地點、同一種的「族群」定義！"
+      },
+      {
+        id: 4,
+        title: "淡水紅樹林沼澤區中，生活在一起的「水筆仔、招潮蟹、彈塗魚和白鷺鷥」總合起來是？",
+        category: "河口紅樹林",
+        emoji: "🦀",
+        scenario: "沼澤中的水筆仔提供庇護，招潮蟹與彈塗魚覓食，白鷺鷥在此捕魚，彼此互相依存。",
+        options: [
+          { text: "族群 (Population)", isCorrect: false },
+          { text: "群集 (Community)", isCorrect: true }
+        ],
+        explanation: "沒錯！題目提到了水筆仔（植物）、招潮蟹與彈塗魚與白鷺鷥（動物），是【多種不同生物族群】生活在同一個環境互相影響，所以稱為「群集」！"
+      },
+      {
+        id: 5,
+        title: "校園生態池中，如果我們只統計調查生活在池水裡的「所有吳郭魚」，這是指？",
+        category: "校園生態池",
+        emoji: "🐟",
+        scenario: "注意：池塘裡可能還有大肚魚或水草，但研究員這一次「只記錄吳郭魚的數量與生長」。",
+        options: [
+          { text: "族群 (Population)", isCorrect: true },
+          { text: "群集 (Community)", isCorrect: false }
+        ],
+        explanation: "完全正確！雖然生態池有許多生命，但單獨觀察「吳郭魚」這單一物種時，討論的是該池塘的「吳郭魚族群」。"
+      },
+      {
+        id: 6,
+        title: "墾丁珊瑚礁海岸中，「小丑魚、海葵、珊瑚蟲、海龜與海藻」共同生活在一起，這屬於？",
+        category: "海洋珊瑚礁",
+        emoji: "🐠",
+        scenario: "小丑魚住在海葵觸手中互相保護，珊瑚蟲與海藻行光合作用互利共生，形成繽紛的水下世界。",
+        options: [
+          { text: "族群 (Population)", isCorrect: false },
+          { text: "群集 (Community)", isCorrect: true }
+        ],
+        explanation: "厲害！小丑魚、海葵、珊瑚與海龜是許多不同種類的生物集合體，大家共同居住在珊瑚礁海域，是典型的「群集」。"
+      },
+      {
+        id: 7,
+        title: "大熱天時，校園操場草皮上生長的「所有黃花酢漿草」，在生態學層次上是？",
+        category: "校園綠地觀察",
+        emoji: "🌼",
+        scenario: "地點：學校操場 / 時間：現在 / 對象：全部同屬於「黃花酢漿草」這一植物物種。",
+        options: [
+          { text: "族群 (Population)", isCorrect: true },
+          { text: "群集 (Community)", isCorrect: false }
+        ],
+        explanation: "很好！植物也是生物喔！同時間生長在操場草坪上的所有黃花酢漿草，屬於同種生物個體群，因此是「族群」。"
+      },
+      {
+        id: 8,
+        title: "如果自然老師說：「我們來研究玉山國家公園內，植物製造養分如何傳遞給松鼠、鳥類與昆蟲的食物鏈網。」這是研究？",
+        category: "食物鏈與能量流",
+        emoji: "🐿️",
+        scenario: "研究重點在於「不同生物之間捕食、共生、競爭」等相互關係。",
+        options: [
+          { text: "群集層次 (Community)", isCorrect: true },
+          { text: "族群層次 (Population)", isCorrect: false }
+        ],
+        explanation: "讚！研究食物網需要探討生產者（植物）、消費者（松鼠、鳥）等多種生物間的互動，跨越了不同物種，所以屬於「群集」的研究範疇！"
+      },
+      {
+        id: 9,
+        title: "台北關渡自然公園的水塘上，今年秋天被賞鳥隊記錄到的所有「花嘴鴨」，屬於？",
+        category: "水鳥棲地",
+        emoji: "🦆",
+        scenario: "地點：關渡水塘 / 時間：今年秋天 / 對象：所有花嘴鴨個體。",
+        options: [
+          { text: "族群 (Population)", isCorrect: true },
+          { text: "群集 (Community)", isCorrect: false }
+        ],
+        explanation: "答對了！特定時間（秋天）、特定地點（關渡），並且只指定「花嘴鴨」單一物種，完全符合「族群」的三大要素！"
+      },
+      {
+        id: 10,
+        title: "【大考思考題】下列哪一個描述「不屬於」族群？",
+        category: "觀念大考驗",
+        emoji: "🧐",
+        scenario: "請找出哪一個選項包含了「不只一種」生物，或者是錯誤的組合！",
+        options: [
+          { text: "宜蘭太平山森林裡所有的「動植物與真菌」", isCorrect: true },
+          { text: "合歡山上同一時間生長的所有「台灣冷杉」", isCorrect: false }
+        ],
+        explanation: "恭喜答對！太平山「所有的動植物與真菌」包含很多很多種生物，它是「群集」而不是族群！合歡山所有的台灣冷杉才是族群。"
+      }
+    ];
+
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = []; // { qIndex, selectedOptionIndex, isCorrect }
+    let quizStartTime = null;
+    let timerInterval = null;
+
+    function shuffleArray(array) {
+      const cloned = [...array];
+      for (let i = cloned.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cloned[i], cloned[j]] = [cloned[j], cloned[i]];
+      }
+      return cloned;
+    }
+
+    function showScreen(screenId) {
+      const screens = ['home-screen', 'guide-screen', 'quiz-screen', 'result-screen', 'certificate-page'];
+      screens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function startQuiz() {
+      playSound('click');
+      currentQuestions = shuffleArray(originalQuestions).map(q => {
+        return {
+          ...q,
+          options: shuffleArray(q.options)
+        };
+      });
+      currentQuestionIndex = 0;
+      userAnswers = [];
+
+      // 啟動碼表
+      quizStartTime = Date.now();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimerDisplay, 1000);
+      updateTimerDisplay();
+
+      showScreen('quiz-screen');
+      renderQuestion();
+    }
+
+    function updateTimerDisplay() {
+      if (!quizStartTime) return;
+      const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+      const m = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+      const s = String(elapsedSeconds % 60).padStart(2, '0');
+      const timerEl = document.getElementById('quiz-timer');
+      if (timerEl) timerEl.textContent = `${m}:${s}`;
+    }
+
+    function renderQuestion() {
+      const q = currentQuestions[currentQuestionIndex];
+      const totalCount = currentQuestions.length;
+
+      // 更新進度與標題
+      document.getElementById('current-q-index').textContent = currentQuestionIndex + 1;
+      document.getElementById('total-q-count').textContent = totalCount;
+      const pct = ((currentQuestionIndex + 1) / totalCount) * 100;
+      document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+
+      document.getElementById('q-category').innerHTML = `🌿 ${q.category}`;
+      document.getElementById('q-title').textContent = `${currentQuestionIndex + 1}. ${q.title}`;
+      document.getElementById('q-emoji').textContent = q.emoji;
+      document.getElementById('q-scenario-desc').textContent = q.scenario;
+
+      // 隱藏解析面板與下一題按鈕
+      const feedbackPanel = document.getElementById('feedback-panel');
+      feedbackPanel.classList.add('hidden');
+      feedbackPanel.className = 'hidden p-5 rounded-2xl border transition-all mt-4';
+      document.getElementById('next-btn').classList.add('hidden');
+
+      // 渲染選項按鈕
+      const optionsBox = document.getElementById('options-container');
+      optionsBox.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-4 sm:p-5 rounded-2xl border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 bg-white transition duration-150 font-bold text-slate-800 text-base sm:text-lg flex items-center justify-between group active:scale-[0.99]";
+        btn.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-emerald-200 text-slate-600 group-hover:text-emerald-900 flex items-center justify-center text-sm font-black transition">
+              ${idx === 0 ? 'A' : 'B'}
+            </span>
+            <span>${opt.text}</span>
+          </div>
+          <span class="text-xl opacity-0 group-hover:opacity-100 transition transform group-hover:translate-x-1">👉</span>
+        `;
+        btn.onclick = () => selectOption(idx);
+        optionsBox.appendChild(btn);
+      });
+    }
+
+    function selectOption(selectedIdx) {
+      const q = currentQuestions[currentQuestionIndex];
+      const selected = q.options[selectedIdx];
+      const isCorrect = selected.isCorrect;
+
+      // 播放音效
+      if (isCorrect) {
+        playSound('correct');
+      } else {
+        playSound('wrong');
+      }
+
+      // 記錄使用者作答
+      userAnswers.push({
+        question: q,
+        selectedOption: selected,
+        isCorrect: isCorrect
+      });
+
+      // 禁用所有按鈕並標註紅綠邊框
+      const optionsBox = document.getElementById('options-container');
+      const buttons = optionsBox.querySelectorAll('button');
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        btn.classList.remove('hover:border-emerald-500', 'hover:bg-emerald-50/50', 'active:scale-[0.99]');
+        if (q.options[idx].isCorrect) {
+          btn.classList.add('border-emerald-500', 'bg-emerald-100/70', 'text-emerald-950');
+        } else if (idx === selectedIdx && !isCorrect) {
+          btn.classList.add('border-rose-400', 'bg-rose-50', 'text-rose-900');
+        } else {
+          btn.classList.add('opacity-50');
+        }
+      });
+
+      // 顯示解析面板
+      const feedbackPanel = document.getElementById('feedback-panel');
+      const feedbackTitle = document.getElementById('feedback-title');
+      const feedbackExplanation = document.getElementById('feedback-explanation');
+      const feedbackIcon = document.getElementById('feedback-icon');
+
+      if (isCorrect) {
+        feedbackPanel.className = "p-5 rounded-2xl border border-emerald-300 bg-emerald-50 text-emerald-900 mt-4 block animate-fadeIn";
+        feedbackIcon.textContent = "🎉";
+        feedbackTitle.textContent = "恭喜答對！完全掌握概念！";
+      } else {
+        feedbackPanel.className = "p-5 rounded-2xl border border-amber-300 bg-amber-50 text-amber-950 mt-4 block animate-fadeIn";
+        feedbackIcon.textContent = "💡";
+        feedbackTitle.textContent = `稍微看漏了！正確答案是：${q.options.find(o => o.isCorrect).text}`;
+      }
+
+      feedbackExplanation.textContent = q.explanation;
+
+      // 顯示「下一題」或「看成績」按鈕
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.classList.remove('hidden');
+      if (currentQuestionIndex === currentQuestions.length - 1) {
+        nextBtn.innerHTML = `<span>結算成績</span> <span>📊</span>`;
+      } else {
+        nextBtn.innerHTML = `<span>下一題</span> <span>👉</span>`;
+      }
+    }
+
+    function goToNextQuestion() {
+      playSound('click');
+      if (currentQuestionIndex < currentQuestions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      if (timerInterval) clearInterval(timerInterval);
+
+      const total = userAnswers.length;
+      const correctCount = userAnswers.filter(a => a.isCorrect).length;
+      const percentage = Math.round((correctCount / total) * 100);
+
+      document.getElementById('res-total').textContent = total;
+      document.getElementById('res-correct').textContent = correctCount;
+      document.getElementById('res-percentage').textContent = `${percentage}%`;
+
+      const heading = document.getElementById('result-heading');
+      const subheading = document.getElementById('result-subheading');
+      const badgeContainer = document.getElementById('result-badge-container');
+      const feedbackBox = document.getElementById('result-feedback-box');
+      const actions = document.getElementById('result-actions');
+
+      const isPassed = percentage >= 85;
+
+      if (isPassed) {
+        playSound('celebrate');
+        // 施放滿版彩帶慶祝
+        if (window.confetti) {
+          confetti({
+            particleCount: 80,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        }
+
+        badgeContainer.className = "w-24 h-24 mx-auto mb-4 rounded-3xl flex items-center justify-center text-5xl shadow-lg bg-gradient-to-tr from-amber-400 to-yellow-300 text-amber-950 animate-float";
+        badgeContainer.textContent = "🏆";
+
+        heading.textContent = "太厲害了！榮登生態小博士！";
+        heading.className = "text-2xl sm:text-3xl font-black text-emerald-800 mb-2";
+        subheading.textContent = `答對率高達 ${percentage}%，已超越 85% 的精熟標準！`;
+
+        feedbackBox.className = "p-5 rounded-2xl mb-8 text-left text-sm leading-relaxed border border-emerald-200 bg-emerald-50/80 text-emerald-950";
+        feedbackBox.innerHTML = `
+          <div class="font-black text-emerald-900 text-base mb-1 flex items-center gap-1.5">
+            <span>🌟 老師的評語：</span>
+          </div>
+          <p>你對「同時間、同地點、同一種生物＝族群」以及「同環境中所有生物族群的總和＝群集」掌握得非常透徹！具備了極佳的科學觀察力與分類素養，快點領取專屬你的「榮譽獎狀」吧！</p>
+        `;
+
+        actions.innerHTML = `
+          <button onclick="openCertificate(${percentage})" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-base shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2">
+            <span>🎖️ 領取小博士榮譽獎狀</span>
+          </button>
+          <button onclick="startQuiz()" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+            🔄 再挑戰一次滿分
+          </button>
+        `;
+      } else {
+        playSound('wrong');
+        badgeContainer.className = "w-24 h-24 mx-auto mb-4 rounded-3xl flex items-center justify-center text-5xl shadow-lg bg-gradient-to-tr from-teal-400 to-emerald-400 text-white animate-float";
+        badgeContainer.textContent = "🌱";
+
+        heading.textContent = "再加把勁！離小博士只差一步囉！";
+        heading.className = "text-2xl sm:text-3xl font-black text-slate-800 mb-2";
+        subheading.textContent = `目前答對率為 ${percentage}%（通過門檻為 85%）`;
+
+        feedbackBox.className = "p-5 rounded-2xl mb-8 text-left text-sm leading-relaxed border border-amber-200 bg-amber-50/80 text-amber-950";
+        feedbackBox.innerHTML = `
+          <div class="font-black text-amber-900 text-base mb-1 flex items-center gap-1.5">
+            <span>💪 溫馨正向鼓勵：</span>
+          </div>
+          <p class="mb-2">每一個偉大的生態學家都是從不斷嘗試中進步的！你已經很認真完成了 10 題測試。稍微檢視一下下方題目中把「單一物種（族群）」跟「多種物種（群集）」搞混的地方，重新再挑戰一次，一定能順利解鎖獎狀！</p>
+          <div class="text-xs bg-white/70 p-2.5 rounded-xl border border-amber-200 text-slate-700">
+            <strong>快速口訣：</strong> 先看是不是只有「一種生物」？如果是就是族群；如果有樹、鳥、魚很多種一起生活，就是群集！
+          </div>
+        `;
+
+        actions.innerHTML = `
+          <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-base shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2">
+            <span>🔄 立即重新挑戰題目</span>
+          </button>
+          <button onclick="showScreen('guide-screen')" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-sm transition">
+            📖 快速複習概念秘笈
+          </button>
+        `;
+      }
+
+      // 渲染錯題與解析清單
+      renderReviewList();
+      showScreen('result-screen');
+    }
+
+    function renderReviewList() {
+      const reviewBox = document.getElementById('review-list');
+      reviewBox.innerHTML = '';
+
+      userAnswers.forEach((ans, index) => {
+        const item = document.createElement('div');
+        item.className = `p-4 sm:p-5 rounded-2xl border ${ans.isCorrect ? 'border-emerald-100 bg-emerald-50/30' : 'border-rose-100 bg-rose-50/40'} transition`;
+
+        const correctOpt = ans.question.options.find(o => o.isCorrect);
+
+        item.innerHTML = `
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <div class="font-bold text-slate-800 text-sm sm:text-base">
+              ${index + 1}. ${ans.question.title}
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-black shrink-0 ${ans.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+              ${ans.isCorrect ? '✓ 答對' : '✗ 答錯'}
+            </span>
+          </div>
+
+          <div class="text-xs sm:text-sm text-slate-600 mb-2 space-y-1">
+            <p><strong>你的選擇：</strong> <span class="${ans.isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}">${ans.selectedOption.text}</span></p>
+            ${!ans.isCorrect ? `<p><strong>正確解答：</strong> <span class="text-emerald-700 font-bold">${correctOpt.text}</span></p>` : ''}
+          </div>
+
+          <div class="p-3 bg-white/90 rounded-xl border border-slate-100 text-xs text-slate-600 leading-relaxed">
+            <span class="font-bold text-emerald-800">💡 核心解析：</span> ${ans.question.explanation}
+          </div>
+        `;
+
+        reviewBox.appendChild(item);
+      });
+    }
+
+    function openCertificate(score) {
+      playSound('celebrate');
+      document.getElementById('cert-score-display').textContent = `${score}%`;
+
+      // 格式化當前日期
+      const now = new Date();
+      const dateStr = `${now.getFullYear()} 年 ${now.getMonth() + 1} 月 ${now.getDate()} 日`;
+      document.getElementById('cert-date').textContent = dateStr;
+
+      // 監聽學生名字修改
+      const nameInput = document.getElementById('cert-student-name');
+      const namePrint = document.getElementById('cert-student-name-print');
+      nameInput.addEventListener('input', () => {
+        namePrint.textContent = nameInput.value || '六年級自然小達人';
+      });
+
+      showScreen('certificate-page');
+    }
+
+    // 初始化網頁監聽與預備音效
+    window.addEventListener('DOMContentLoaded', () => {
+      document.body.addEventListener('click', () => {
+        if (!synth && window.Tone) {
+          initAudio();
+        }
+      }, { once: true });
+    });
+  </script>
+</body>
+</html>
